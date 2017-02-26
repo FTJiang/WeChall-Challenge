@@ -1,0 +1,179 @@
+Name: Fangte Jiang
+ASUID: 1211380349
+Wechall name: fontaine
+
+
+
+
+level 0:
+command: ssh bandit0@bandit.labs.overthewire.org
+then enter passwd: bandit0
+
+level 1:
+since readme file is inside home directory, after using "ls" command so just "cat readme" to get passwd
+Before login to level1 I should exit level1 by "exit" command
+command: ssh bandit1@bandit.labs.overthewire.org
+enter passwd: boJ9jbbUNNfktd78OOpsqOltutMc3MY1
+
+level2:
+since the file name is a delimiter, it is not common, so we need to tell interpreter that do not interprete following string
+command: cat ./-
+command: ssh bandit2@bandit.labs.overthewire.org
+passwd: CV1DtqXWVFXTvM2F0k09SHz0YwRINYA9
+
+level3:
+since shell will parse command by space and see spaces, in, this and filename as four arguments, we should tell shell space is part of filename
+command: cat spaces\ in\ this\ filename
+passwd: UmHadQclWmgdLOKQ3YNgjWxGoRMb5luK
+
+
+level4:
+command: ls -la list the hidden directory. inside this directory, use ls -la I see a file named .hidden. To open this file, I use command "cat ./.hidden"
+passwd:pIwrPrtPN36QITSp3EQaw936yaFoFgAB
+
+
+level5:
+command: cd into inhere directory and cat all the files. Then I find the passwd is inside .file07
+passwd:koReBOKuIDDepwhWk7jZC0RTdopnAYKh
+
+level6:
+command: cd into inhere and find there are many subdirectory inside. cd into each subdirectory and use command "ls -la" to list long format including hidden file and try to find file with 1033 bytes size. Inside maybehere07 directory, I find .file2 is 1033 bytes and is also unexecutable. cat it I get passwd.
+passwd: DXjZPULLxYr17uwoI01bNLQbtFemEgo7
+
+level7:
+since I am required to search whole machine but the attributes are given, so I use command "find -user bandit7 -group bandit6" at first. It list all the files but most of them show permission denied. To filter them I used .2>/dev/null option and then only file /var/lib/dpkg/info/bandit7.password left. This option ignores all the error.
+passwd: HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
+
+
+level8:
+command: grep -w millionth data.txt
+passwd:	cvX2JJa4CFALtqS87jk27qwqGhBM9plV
+
+
+level9:
+At first I tried uniq -u data.txt, it failed. Then I tried cat data.txt | sort | uniq -u
+passed:UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR
+
+level10:
+At first I used "grep --text data.txt" but it failed. Then I used "strings data.txt | grep = ", it returns me all the text line with '='.
+result like this:
+epr~F=K
+7?YD=
+?M=HqAH
+/(Ne=
+C=_"
+I========== the6
+z5Y=
+`h(8=`
+n\H=;
+========== password
+========== ism
+N$=&
+l/a=L)
+f=C(
+========== truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
+ie)=5e
+
+passwd:truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
+
+
+level 10:
+cat data.txt I got "VGhlIHBhc3N3b3JkIGlzIElGdWt3S0dzRlc4TU9xM0lSRnFyeEUxaHhUTkViVVBSCg==" which is encoded by base4
+to decode it, I use command: echo VGhlIHBhc3N3b3JkIGlzIElGdWt3S0dzRlc4TU9xM0lSRnFyeEUxaHhUTkViVVBSCg== | base64 --decode
+it returns: The password is IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
+
+
+level 11:
+bandit11@melinda:~$ cat data.txt
+Gur cnffjbeq vf 5Gr8L4qetPEsPk8htqjhRK8XSP6x2RHh
+bandit11@melinda:~$ echo "Gur cnffjbeq vf 5Gr8L4qetPEsPk8htqjhRK8XSP6x2RHh" | tr '[a-z]' '[n-za-m]'
+Ghe password is 5Ge8L4drgPEfPx8ugdwuRK8XSP6k2RHu
+bandit11@melinda:~$ echo "Ghe password is 5Ge8L4drgPEfPx8ugdwuRK8XSP6k2RHu" | tr '[A-Z]' '[N-ZA-M]'
+The password is 5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
+
+level 12:
+since it is a hexdump file, I need to re hexdump it by command: xxd -r data.txt foo.bin
+THen I got result: foob.bin: gzip compressed data, was "data2.bin", last modified: Fri Nov 14 04:32:20 2014, max compression, from Unix
+The last compression is by gzip, since there is compression chain, so the output of decompression should be as the input of next decompression in pipeline. Because gzip and bzip2 have companion program named zcat and bzcat whose output are stdout, they are ideal for piping. file - can print the file type of input stdinput.
+command: zcat foo.bin | file -
+result: bzip2 compressed data, block size = 900k
+command: zcat foo.bin | bzcat | file -
+result: /dev/stdin: gzip compressed data, was "data4.bin", last modified: Fri Nov 14 04:32:20 2014, max compression, from Unix
+.
+.
+.
+finally, when use zcat foo.bin | bzcat | zcat | tar xO | tar xO | bzcat | tar xO | zcat | file -
+result: /dev/stdin: ASCII text
+I got the original txt file. To see the file, I run command without file -: zcat foo.bin | bzcat | zcat | tar xO | tar xO | bzcat | tar xO | zcat
+result: The password is 8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL
+
+
+level 13: 
+Since passwd is stored inside /etc/bandit_pass/bandit14 and the file is owned by bandit14, it remind me of dtappgather attack. So I tried ln -s /etc/bandit_pass/bandit14 /var/dt/appconfig/appmanager/generic-display-0. However, it failed with "file exists". Then I ls in the first directory after loginning in, there is a sshkey.private. I can login with this key directly!
+command: ssh -i sshkey.private bandit14@localhost
+
+
+level14:
+since I am now the bandit14, I can access to the passwd file now. In order to send file to localhost, I can use netcat
+command: netcat localhost 30000 > /etc/bandit_pass/bandit14
+But it doesn't work because there is a error: operation not permitted. So I can not send file directly, what about send content?
+new command: cat /etc/bandit_pass/bandit14 | netcat localhost 30000
+passwd: BfMYroe26WYalil77FoDi9qh59eK5xNr
+
+
+level15:
+At first I used command similar to level14: "cat /etc/bandit_pass/bandit15 | openssl s_client -connect 127.0.0.1:30001" but I encountered heartbeating. After google, I find that I can use -quiet option to overcome it.
+command:"cat /etc/bandit_pass/bandit15 | openssl s_client -connect 127.0.0.1:30001 -quiet"
+passwd: cluFn7wTiGryunymYOu4RcffSxQluehd
+
+
+level16:
+First, I got the open port by command: "netcat -z 127.0.0.1 31000-32000 -v 2>&1 | grep succeeded", it do port scanning from 31000 to 32000 and do not establish connection. All the message are sent to stdout and filted by grep command.
+open ports I got are
+Connection to 127.0.0.1 31046 port [tcp/*] succeeded!
+Connection to 127.0.0.1 31518 port [tcp/*] succeeded!
+Connection to 127.0.0.1 31691 port [tcp/*] succeeded!
+Connection to 127.0.0.1 31790 port [tcp/*] succeeded!
+Connection to 127.0.0.1 31960 port [tcp/*] succeeded!
+Then I use command:"cat /etc/bandit_pass/bandit16 | openssl s_client -connect 127.0.0.1:31790 -quiet" send one by one. port 31046 give me different content but not passwd directly, it is a key. So I need to create a key for login.
+mkdir /tmp/fontainekey
+touch sshkey.pem
+vi sshkey.pem
+paste the key obtained and save and close
+ssh -i sshkey.pem bandit17@localhost
+connection is denied because my key can be touched by other users, so I need to change mode before connect
+chmod 600 sshkey.pem
+
+level17:
+Many command can solve this level
+grep -F -x -v -f passwords.old passwords.new
+kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
+this is the line belongs to new, not old
+diff passwords.new  passwords.old
+< kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
+---
+> bECYSoXjOeGseirUCztuCBDF3xXqE7By
+first line belongs to new and second belongs to old
+so passed is: kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
+
+level18
+Since we will be log out after login, so why not try to execute cat command immediately after logging in.
+command: ssh bandit18@bandit.labs.overthewire.org -t 'cat readme'
+passwd:IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x
+
+level19
+After executing the setuid binary, it shows that Run a command as another user.
+  Example: ./bandit20-do id
+So I tried to get the user id of bandit20 by command: id bandit20
+it shows: uid=11020(bandit20) gid=11020(bandit20) groups=11020(bandit20)
+Then I run: ./bandit20-do 11020
+Result is no such file.
+I also tried id of current user, still no such file. So I think maybe the hint is not correct, I do not need userid because the function of this file is run as another user. Why not just run this file and do cat?
+command: ./bandit20-do cat /etc/bandit_pass/bandit20
+result: GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+
+
+level20
+This level requires me to open two terminal, one for ./suconnect and another for localhost. I used netcat as a server. Since the expected message is the passwd of bandit20, so I cat passwd file as stdin to cat server by command: "cat /etc/bandit_pass/bandit20 | nc -l 65510";
+Then when "./suconnect 65510" connect to localhost. It give me the passed:Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+
