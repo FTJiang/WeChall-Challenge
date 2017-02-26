@@ -1,10 +1,3 @@
-Name: Fangte Jiang
-ASUID: 1211380349
-Wechall name: fontaine
-
-
-
-
 level 0:
 command: ssh bandit0@bandit.labs.overthewire.org
 then enter passwd: bandit0
